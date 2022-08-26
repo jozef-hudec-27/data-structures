@@ -176,10 +176,27 @@ class LinkedList
 
     self
   end
+
+  def reverse!
+    raise 'Cannot reverse empty list' if @size.zero?
+
+    current_node = @head
+    prev_node = nil
+
+    while current_node
+      current_node.nxt, prev_node, current_node = prev_node, current_node, current_node.nxt
+    end
+
+    @head, @tail = @tail, @head
+
+    self
+  end
 end
 
 linked_list = LinkedList.new
 linked_list.append('b')
 linked_list.append('c')
+linked_list.append('d')
 linked_list.prepend('a')
+linked_list.reverse!
 puts linked_list
