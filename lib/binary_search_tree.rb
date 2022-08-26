@@ -80,6 +80,28 @@ class Tree
         node == @root ? self : node
     end
 
+    def delete(value, node=@root)
+        return if node.nil?
+
+        if value < node.value
+            node.left = delete(value, node.left)
+        elsif value > node.value
+            node.right = delete(value, node.right)
+        else
+            if node.left.nil?
+                return node.right
+            elsif node.right.nil?
+                return node.left
+            end
+
+            temp = smallest_node(node.right)
+            node.value = temp.value
+            node.right = delete(temp.value, node.right)
+        end
+
+        node
+    end
+
     private
 
     def build_tree(array)
@@ -89,8 +111,16 @@ class Tree
 
         parent = Node.new(array[n / 2], build_tree(array[0...n / 2]), build_tree(array[(n / 2) + 1..]))
     end
+
+    def smallest_node(node=@root)
+        return node if node.leaf? || node.left.nil?
+        
+        smallest_node(node.left)
+    end
 end
 
 tree = Tree.new([3, 1, 2, 7, 5, 9])
 tree.insert(11)
+p tree.inorder 
+tree.delete(11)
 p tree.inorder 
