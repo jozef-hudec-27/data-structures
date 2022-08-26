@@ -5,6 +5,10 @@ class Node
     @value = value
     @nxt = nxt
   end
+
+  def to_s
+    @value.nil? ? 'nil' : @value
+  end
 end
 
 class LinkedList
@@ -22,6 +26,8 @@ class LinkedList
     @tail = new_node
     @head = new_node if @head.nil?
     @size += 1
+
+    self
   end
 
   def prepend(value)
@@ -29,22 +35,26 @@ class LinkedList
     @head = new_node
     @tail = new_node if @tail.nil?
     @size += 1
+
+    self
   end
 
   def at(index)
+    raise 'Index cannot be negative' if index.negative?
+
+    raise 'Index too high' if index >= @size
+
     node = @head
 
-    index.times do
-      raise 'Index too high' if node.nil?
-
-      node = node.nxt
-    end
+    index.times { node = node.nxt }
 
     node
   end
 
   def pop
     raise 'Cannot pop from empty linked list' if @head.nil?
+
+    removed_node = @tail
 
     if @head == @tail
       @head, @tail = nil, nil
@@ -62,6 +72,7 @@ class LinkedList
     end
 
     @size -= 1
+    removed_node
   end
 
   def contains?(value)
@@ -95,7 +106,7 @@ class LinkedList
     node = @head
 
     while node
-      nodes.push(node.value || 'nil')
+      nodes.push(node.to_s)
       node = node.nxt
     end
 
@@ -103,23 +114,29 @@ class LinkedList
   end
 
   def remove_at(index)
-    raise 'Invalid index' if index < -@size || index >= @size
+    raise 'Index too low' if index < -@size
+
+    raise 'Index too high' if index >= @size
 
     index = @size + index if index.negative?
 
     if index.zero?
+      removed_node = @head
       @head = @head&.nxt
     elsif index == @size - 1
-      pop
+      removed_node = pop
     else
       node_before = @head
 
-      (index - 1).times { node_before = node_before&.nxt }
+      (index - 1).times { node_before = node_before.nxt }
 
+      removed_node = node_before.nxt
       node_before.nxt = node_before.nxt.nxt
     end
 
     @size -= 1
+
+    removed_node
   end
 
   def insert_at(index, value)
@@ -132,11 +149,11 @@ class LinkedList
     elsif index == @size
       append(value)
     else
-      node_before = index - 1 < @size ? at(index - 1) : nil 
+      node_before = index - 1 < @size ? at(index - 1) : nil
       unless node_before
         if @head.nil?
-          @head = Node.new(nil, Node.new)
-          @tail = @head.nxt
+          @head = Node.new
+          @tail = @head
           @size = 1
         end
 
@@ -153,19 +170,16 @@ class LinkedList
 
       end
 
-      node_before.nxt, new_node.nxt = new_node, node_before.nxt        
+      node_before.nxt, new_node.nxt = new_node, node_before.nxt
       @size += 1
     end
-  end
 
+    self
+  end
 end
 
-my_linked_list = LinkedList.new
-my_linked_list.append(1)
-my_linked_list.append(2)
-my_linked_list.append(3)
-my_linked_list.append(4)
-my_linked_list.append(5)
-my_linked_list.prepend(-1)
-my_linked_list.insert_at(10, 1488)
-p [my_linked_list.to_s, my_linked_list.size]
+linked_list = LinkedList.new
+linked_list.append('b')
+linked_list.append('c')
+linked_list.prepend('a')
+puts linked_list
