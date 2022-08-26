@@ -120,6 +120,22 @@ class Tree
         1 + depth(node, root.left) || depth(node, root.right)
     end
 
+    def balanced?(node = @root)
+        return true if node.leaf?
+        
+        if node.left.nil?
+            return node.right.leaf?
+        elsif node.right.nil?
+            return node.left.leaf?
+        end
+        
+        balanced?(node.left) && balanced?(node.right)
+    end
+
+    def rebalance
+        @root = build_tree(level_order)
+    end
+
     private
 
     def build_tree(array)
@@ -137,6 +153,19 @@ class Tree
     end
 end
 
-tree = Tree.new([3, 1, 2, 7, 5, 9])
-tree.insert(11)
-p tree.depth(tree.root.right.left) 
+tree = Tree.new((Array.new(15) { rand(1..100) }))
+puts "Balanced: #{tree.balanced?}"
+puts "Level order: #{tree.level_order}"
+puts "Preorder: #{tree.preorder}"
+puts "Postorder: #{tree.postorder}"
+puts "Inorder: #{tree.inorder}"
+tree.insert(110)
+tree.insert(120)
+tree.insert(300)
+puts "Balanced: #{tree.balanced?}"
+tree.rebalance
+puts "Balanced: #{tree.balanced?}"
+puts "Level order: #{tree.level_order}"
+puts "Preorder: #{tree.preorder}"
+puts "Postorder: #{tree.postorder}"
+puts "Inorder: #{tree.inorder}"
