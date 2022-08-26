@@ -38,7 +38,7 @@ class Tree
         nodes
     end
 
-    def preorder(nodes=[], node=@root, &block)
+    def preorder(nodes= [], node = @root, &block)
         return if node.nil?
         
         yield node if block_given?        
@@ -50,7 +50,7 @@ class Tree
         nodes
     end
 
-    def inorder(nodes=[], node=@root, &block)
+    def inorder(nodes= [], node = @root, &block)
         return if node.nil?
 
         inorder(nodes, node.left, &block)
@@ -63,7 +63,7 @@ class Tree
         nodes
     end
 
-    def postorder(nodes=[], node=@root, &block)
+    def postorder(nodes =[], node = @root, &block)
         return if node.nil?
 
         postorder(nodes, node.left, &block)
@@ -73,14 +73,14 @@ class Tree
         nodes << node.value
     end
 
-    def insert(value, node=@root)
+    def insert(value, node = @root)
         return Node.new(value) if node.nil?
         node.left = insert(value, node.left) if value < node.value
         node.right = insert(value, node.right) if value > node.value
         node == @root ? self : node
     end
 
-    def delete(value, node=@root)
+    def delete(value, node = @root)
         return if node.nil?
 
         if value < node.value
@@ -102,6 +102,24 @@ class Tree
         node
     end
 
+    def find(value, node = @root)
+        return node if node.nil? || node.value == value
+        find(value, node.left) || find(value, node.right)
+    end
+
+    def height(node = @root)
+        return 0 if node.nil? || node.leaf?
+
+        return 1 + [height(node.left), height(node.right)].max
+    end
+
+    def depth(node, root=@root)
+        return -1 if root.nil?
+        return 0 if root == node
+
+        1 + depth(node, root.left) || depth(node, root.right)
+    end
+
     private
 
     def build_tree(array)
@@ -112,7 +130,7 @@ class Tree
         parent = Node.new(array[n / 2], build_tree(array[0...n / 2]), build_tree(array[(n / 2) + 1..]))
     end
 
-    def smallest_node(node=@root)
+    def smallest_node(node = @root)
         return node if node.leaf? || node.left.nil?
         
         smallest_node(node.left)
@@ -121,6 +139,4 @@ end
 
 tree = Tree.new([3, 1, 2, 7, 5, 9])
 tree.insert(11)
-p tree.inorder 
-tree.delete(11)
-p tree.inorder 
+p tree.depth(tree.root.right.left) 
