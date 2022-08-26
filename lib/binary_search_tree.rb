@@ -10,6 +10,10 @@ class Node
     def to_s
         @value.nil? ? 'nil' : value.to_s
     end
+
+    def leaf?
+        return @left.nil? && @right.nil?
+    end
 end
 
 class Tree
@@ -25,6 +29,7 @@ class Tree
 
         until q.empty?
             node = q.shift
+            yield node if block_given?
             nodes << node.value
             q << node.left if node.left
             q << node.right if node.right
@@ -33,38 +38,46 @@ class Tree
         nodes
     end
 
-    def preorder(nodes=[], node=@root)
+    def preorder(nodes=[], node=@root, &block)
         return if node.nil?
-
+        
+        yield node if block_given?        
         nodes << node.value
-        preorder(nodes, node.left)
-        preorder(nodes, node.right)
+
+        preorder(nodes, node.left, &block)
+        preorder(nodes, node.right, &block)
 
         nodes
     end
 
-    def inorder(nodes=[], node=@root)
+    def inorder(nodes=[], node=@root, &block)
         return if node.nil?
 
-        inorder(nodes, node.left)
+        inorder(nodes, node.left, &block)
+
+        yield node if block_given?   
         nodes << node.value
-        inorder(nodes, node.right)
+
+        inorder(nodes, node.right, &block)
 
         nodes
     end
 
-    def postorder(nodes=[], node=@root)
+    def postorder(nodes=[], node=@root, &block)
         return if node.nil?
 
-        postorder(nodes, node.left)
-        postorder(nodes, node.right)
+        postorder(nodes, node.left, &block)
+        postorder(nodes, node.right, &block)
+        
+        yield node if block_given?   
         nodes << node.value
     end
 
-    def insert(value)
-    end
-
-    def delete(value)
+    def insert(value, node=@root)
+        return Node.new(value) if node.nil?
+        node.left = insert(value, node.left) if value < node.value
+        node.right = insert(value, node.right) if value > node.value
+        node == @root ? self : node
     end
 
     private
@@ -79,4 +92,5 @@ class Tree
 end
 
 tree = Tree.new([3, 1, 2, 7, 5, 9])
-p tree.inorder
+tree.insert(11)
+p tree.inorder 
