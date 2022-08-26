@@ -138,6 +138,14 @@ class Tree
     @root = build_tree(level_order)
   end
 
+  def invert(node = @root)
+    return node if node.nil? || node.leaf?
+
+    invert(node.left)
+    invert(node.right)
+    node.left, node.right = node.right, node.left
+  end
+
   private
 
   def build_tree(array)
